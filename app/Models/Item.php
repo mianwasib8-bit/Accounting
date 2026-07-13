@@ -32,8 +32,8 @@ class Item
     }
 
     /**
-     * Next item code under category: categoryCode (2) + serial (4)
-     * e.g. category 01 → 010001, 010002…
+     * Next item code under category:
+     * category (2 digits) + item serial (2 digits) e.g. 0101, 0102, 0201
      */
     public static function nextCode(int $categoryId): string
     {
@@ -52,9 +52,9 @@ class Item
         $max = 0;
         foreach ($rows as $r) {
             $digits = preg_replace('/\D/', '', (string)$r['item_code']);
-            // last 4 digits = serial under category
-            if (strlen($digits) >= 4) {
-                $serial = (int)substr($digits, -4);
+            // last 2 digits = item serial under category
+            if (strlen($digits) >= 2) {
+                $serial = (int)substr($digits, -2);
             } else {
                 $serial = (int)$digits;
             }
@@ -62,7 +62,7 @@ class Item
                 $max = $serial;
             }
         }
-        $next = str_pad((string)($max + 1), 4, '0', STR_PAD_LEFT);
+        $next = str_pad((string)($max + 1), 2, '0', STR_PAD_LEFT);
         return $prefix . $next;
     }
 

@@ -908,6 +908,45 @@ html[data-theme="dark"] .alert-info { background: rgba(99,102,241,.12); color: #
   color: var(--action, var(--brand));
   font-size: 18px;
 }
+
+/* Small pretty action icons in tables */
+.icon-action {
+  display: inline-grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  margin: 0 2px;
+  border: 0;
+  border-radius: 10px;
+  background: var(--surface-2);
+  color: var(--muted);
+  cursor: pointer;
+  transition: background .15s, color .15s, transform .1s, box-shadow .15s;
+  vertical-align: middle;
+}
+.icon-action:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(15, 23, 42, .08);
+}
+.icon-action.btn-edit:hover {
+  background: rgba(37, 99, 235, .12);
+  color: #2563eb;
+}
+.icon-action.btn-del:hover {
+  background: rgba(220, 38, 38, .1);
+  color: #dc2626;
+}
+html[data-theme="dark"] .icon-action {
+  background: rgba(255,255,255,.06);
+}
+html[data-theme="dark"] .icon-action.btn-edit:hover {
+  background: rgba(96, 165, 250, .15);
+  color: #60a5fa;
+}
+html[data-theme="dark"] .icon-action.btn-del:hover {
+  background: rgba(251, 113, 133, .15);
+  color: #fb7185;
+}
 .voucher-card {
   max-width: 920px;
   margin: 0 auto;

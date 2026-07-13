@@ -352,7 +352,7 @@ CREATE TABLE item_categories (
 
 -- ------------------------------------------------------------
 -- Items Master (New Item Adder)
--- item_code auto under category: category(2) + serial(4) e.g. 010001
+-- item_code auto under category: category(2) + item serial(2) e.g. 0101, 0102
 -- No picture field — not required
 -- stock / rates managed here; purchase form will fetch later
 -- ------------------------------------------------------------

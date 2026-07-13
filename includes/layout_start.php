@@ -22,7 +22,7 @@ function inGroup(array $keys, string $active): bool
 }
 
 $headsOpen = inGroup(['main_head', 'sub_head', 'subsidiary_head', 'coa'], $activePage);
-$inventoryOpen = inGroup(['item_adder', 'purchase'], $activePage);
+$inventoryOpen = inGroup(['item_category', 'item_adder', 'purchase'], $activePage);
 $vouchersOpen = inGroup(['crv', 'cpv', 'jv', 'voucher_list'], $activePage);
 $userOpen = inGroup(['profile', 'password'], $activePage);
 ?>
@@ -46,7 +46,7 @@ $userOpen = inGroup(['profile', 'password'], $activePage);
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="<?= e(url('/assets/css/app.css')) ?>?v=12" />
+  <link rel="stylesheet" href="<?= e(url('/assets/css/app.css')) ?>?v=13" />
   <style>.hidden{display:none!important}</style>
 </head>
 <body>
@@ -112,9 +112,13 @@ $userOpen = inGroup(['profile', 'password'], $activePage);
           <svg class="nav-chevron sidebar-label" width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
         </button>
         <div class="nav-flyout">
+          <a class="nav-sublink <?= isActive('item_category', $activePage) ?>" href="<?= e(url('/modules/inventory/category.php')) ?>">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/></svg>
+            Categories
+          </a>
           <a class="nav-sublink <?= isActive('item_adder', $activePage) ?>" href="<?= e(url('/modules/inventory/item_adder.php')) ?>">
             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 4v16m8-8H4"/></svg>
-            New Item Adder
+            Items
           </a>
           <a class="nav-sublink <?= isActive('purchase', $activePage) ?>" href="<?= e(url('/modules/inventory/purchase.php')) ?>">
             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.3 2.3c-.4.4-.1 1.1.4 1.1H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 100 4 2 2 0 000-4z"/></svg>
