@@ -21,7 +21,7 @@ class VoucherService
     public static function previewNext(string $type, string $date): array
     {
         $type = strtoupper($type);
-        if (!in_array($type, ['CRV', 'CPV', 'JV'], true)) {
+        if (!in_array($type, ['CRV', 'CPV', 'JV', 'PUR'], true)) {
             throw new RuntimeException('Invalid voucher type.');
         }
         $fy = FinancialYearService::resolveForDate($date);

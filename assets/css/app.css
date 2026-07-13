@@ -851,9 +851,62 @@ html[data-theme="dark"] .alert-info { background: rgba(99,102,241,.12); color: #
 .voucher-page-head h2 { font-size: 18px; }
 .voucher-page-head p { font-size: 12px; }
 .section-head.voucher-page-head {
-  max-width: 920px;
+  max-width: 1100px;
   margin-left: auto;
   margin-right: auto;
+}
+
+/* Purchase form */
+.purchase-card {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+.purchase-header {
+  padding: 12px 16px !important;
+}
+.purchase-meta-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px 12px;
+}
+@media (min-width: 900px) {
+  .purchase-meta-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+.purchase-lines table.data thead th {
+  padding: 7px 8px;
+  font-size: 10px;
+  white-space: nowrap;
+}
+.purchase-lines table.data tbody td {
+  padding: 6px 8px;
+}
+.purchase-footer {
+  border-top: 1px solid var(--line);
+  padding: 12px 16px !important;
+}
+.purchase-totals {
+  max-width: 320px;
+  margin-left: auto;
+  display: grid;
+  gap: 8px;
+}
+.purchase-totals .tot-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 13px;
+}
+.purchase-totals .tot-net {
+  padding-top: 8px;
+  border-top: 1px solid var(--line);
+  font-size: 15px;
+}
+.purchase-totals .tot-net strong {
+  color: var(--action, var(--brand));
+  font-size: 18px;
 }
 .voucher-card {
   max-width: 920px;

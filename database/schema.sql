@@ -174,7 +174,7 @@ CREATE TABLE voucher_sequence (
   id                 INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
   financial_year_id  INT UNSIGNED NOT NULL,
   sequence_no        INT UNSIGNED NOT NULL,
-  voucher_type       ENUM('CRV','CPV','JV','BRV','BPV') NOT NULL,
+  voucher_type       ENUM('CRV','CPV','JV','PUR','BRV','BPV') NOT NULL,
   voucher_id         INT UNSIGNED NOT NULL,
   voucher_no         INT UNSIGNED NOT NULL,
   voucher_ref        VARCHAR(30) NOT NULL,
@@ -300,7 +300,7 @@ CREATE TABLE ledger (
   id                 BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
   financial_year_id  INT UNSIGNED NOT NULL,
   sequence_no        INT UNSIGNED NOT NULL,
-  voucher_type       ENUM('CRV','CPV','JV','BRV','BPV','OB') NOT NULL,
+  voucher_type       ENUM('CRV','CPV','JV','PUR','BRV','BPV','OB') NOT NULL,
   voucher_id         INT UNSIGNED NOT NULL,
   voucher_ref        VARCHAR(30) NOT NULL,
   voucher_date       DATE NOT NULL,
@@ -376,6 +376,64 @@ CREATE TABLE items (
   CONSTRAINT fk_items_user FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE SET NULL
 ) ENGINE=InnoDB;
 
+-- ------------------------------------------------------------
+-- Purchase Form (master + item lines)
+-- invoice_no auto 1,2,3… per FY · sequence shared with CRV/CPV/JV
+-- bill_no user-entered · cash/credit · party + company
+-- Lines: item, packing, batch, qty, rate, double discount → net
+-- Footer: total + bill expense → final net
+-- ------------------------------------------------------------
+CREATE TABLE purchases (
+  id                 INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  financial_year_id  INT UNSIGNED NOT NULL,
+  invoice_no         INT UNSIGNED NOT NULL,
+  voucher_ref        VARCHAR(30) NOT NULL,
+  purchase_date      DATE NOT NULL,
+  bill_no            VARCHAR(50) NULL,
+  pay_mode           ENUM('Cash','Credit') NOT NULL DEFAULT 'Credit',
+  party_id           INT UNSIGNED NOT NULL COMMENT 'Supplier subsidiary head',
+  company_name       VARCHAR(150) NULL,
+  cash_account_id    INT UNSIGNED NULL COMMENT 'Required when pay_mode=Cash',
+  subtotal           DECIMAL(18,2) NOT NULL DEFAULT 0.00 COMMENT 'Sum of line net amounts',
+  bill_expense       DECIMAL(18,2) NOT NULL DEFAULT 0.00,
+  net_amount         DECIMAL(18,2) NOT NULL DEFAULT 0.00 COMMENT 'subtotal + bill_expense',
+  narration          VARCHAR(500) NULL,
+  status             ENUM('posted','void') NOT NULL DEFAULT 'posted',
+  created_by         INT UNSIGNED NULL,
+  created_at         TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at         TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  UNIQUE KEY uq_pur_fy_inv (financial_year_id, invoice_no),
+  UNIQUE KEY uq_pur_ref (voucher_ref),
+  KEY idx_pur_party (party_id),
+  KEY idx_pur_date (purchase_date),
+  CONSTRAINT fk_pur_fy FOREIGN KEY (financial_year_id) REFERENCES financial_years(id),
+  CONSTRAINT fk_pur_party FOREIGN KEY (party_id) REFERENCES subsidiary_heads(id),
+  CONSTRAINT fk_pur_cash FOREIGN KEY (cash_account_id) REFERENCES subsidiary_heads(id),
+  CONSTRAINT fk_pur_user FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE SET NULL
+) ENGINE=InnoDB;
+
+CREATE TABLE purchase_details (
+  id                INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  purchase_id       INT UNSIGNED NOT NULL,
+  line_no           SMALLINT UNSIGNED NOT NULL DEFAULT 1,
+  item_id           INT UNSIGNED NOT NULL,
+  item_code         VARCHAR(20) NOT NULL,
+  item_title        VARCHAR(200) NOT NULL,
+  packing           VARCHAR(80) NULL,
+  batch_no          VARCHAR(50) NULL,
+  qty               DECIMAL(18,3) NOT NULL DEFAULT 0.000,
+  rate              DECIMAL(18,2) NOT NULL DEFAULT 0.00,
+  gross_amount      DECIMAL(18,2) NOT NULL DEFAULT 0.00 COMMENT 'qty * rate',
+  disc1_pct         DECIMAL(8,2) NOT NULL DEFAULT 0.00,
+  disc1_amt         DECIMAL(18,2) NOT NULL DEFAULT 0.00,
+  amount_after_d1   DECIMAL(18,2) NOT NULL DEFAULT 0.00,
+  disc2_pct         DECIMAL(8,2) NOT NULL DEFAULT 0.00,
+  disc2_amt         DECIMAL(18,2) NOT NULL DEFAULT 0.00,
+  net_amount        DECIMAL(18,2) NOT NULL DEFAULT 0.00,
+  CONSTRAINT fk_purd_master FOREIGN KEY (purchase_id) REFERENCES purchases(id) ON DELETE CASCADE,
+  CONSTRAINT fk_purd_item FOREIGN KEY (item_id) REFERENCES items(id)
+) ENGINE=InnoDB;
+
 -- ============================================================
 -- Chart of Accounts + Items intentionally EMPTY.
 -- Create heads / categories / items from the app UI.
@@ -388,7 +446,8 @@ CREATE TABLE items (
 --   cash_payment_vouchers + details
 --   journal_vouchers + details
 --   item_categories, items
+--   purchases + purchase_details
 --   ledger, audit_trail
 -- ============================================================
 
-SELECT 'Accounting System full schema imported (empty COA + empty items, JV included)' AS status;
+SELECT 'Accounting System full schema imported (empty COA + items, PUR+JV included)' AS status;

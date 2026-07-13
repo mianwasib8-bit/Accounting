@@ -19,12 +19,13 @@ $sql = 'SELECT vs.*, fy.code AS fy_code,
             WHEN vs.voucher_type = \'CRV\' THEN (SELECT total_amount FROM cash_receipt_vouchers WHERE id = vs.voucher_id)
             WHEN vs.voucher_type = \'CPV\' THEN (SELECT total_amount FROM cash_payment_vouchers WHERE id = vs.voucher_id)
             WHEN vs.voucher_type = \'JV\'  THEN (SELECT total_debit FROM journal_vouchers WHERE id = vs.voucher_id)
+            WHEN vs.voucher_type = \'PUR\' THEN (SELECT net_amount FROM purchases WHERE id = vs.voucher_id)
             ELSE 0
           END AS total_amount
         FROM voucher_sequence vs
         INNER JOIN financial_years fy ON fy.id = vs.financial_year_id
         WHERE 1=1';
-if (in_array($type, ['CRV', 'CPV', 'JV'], true)) {
+if (in_array($type, ['CRV', 'CPV', 'JV', 'PUR'], true)) {
     $sql .= ' AND vs.voucher_type = :t';
     $params['t'] = $type;
 }
@@ -35,6 +36,7 @@ $typePill = [
   'CRV' => 'pill-emerald',
   'CPV' => 'pill-rose',
   'JV'  => 'pill-sky',
+  'PUR' => 'pill-amber',
 ];
 
 require dirname(__DIR__, 2) . '/includes/layout_start.php';
@@ -43,12 +45,13 @@ require dirname(__DIR__, 2) . '/includes/layout_start.php';
 <div class="section-head">
   <div>
     <h2>Voucher List</h2>
-    <p>Shared sequence across CRV · CPV · JV</p>
+    <p>Shared sequence across CRV · CPV · JV · PUR</p>
   </div>
   <div class="flex gap-2 flex-wrap">
     <a href="<?= e(url('/modules/vouchers/cash_receipt.php')) ?>" class="btn btn-primary btn-sm">+ CRV</a>
     <a href="<?= e(url('/modules/vouchers/cash_payment.php')) ?>" class="btn btn-secondary btn-sm">+ CPV</a>
     <a href="<?= e(url('/modules/vouchers/journal_voucher.php')) ?>" class="btn btn-secondary btn-sm">+ JV</a>
+    <a href="<?= e(url('/modules/inventory/purchase.php')) ?>" class="btn btn-secondary btn-sm">+ PUR</a>
   </div>
 </div>
 
@@ -58,6 +61,7 @@ require dirname(__DIR__, 2) . '/includes/layout_start.php';
     <option value="CRV" <?= $type === 'CRV' ? 'selected' : '' ?>>CRV</option>
     <option value="CPV" <?= $type === 'CPV' ? 'selected' : '' ?>>CPV</option>
     <option value="JV"  <?= $type === 'JV'  ? 'selected' : '' ?>>JV</option>
+    <option value="PUR" <?= $type === 'PUR' ? 'selected' : '' ?>>PUR</option>
   </select>
   <button class="btn btn-secondary btn-sm" type="submit">Filter</button>
 </form>
