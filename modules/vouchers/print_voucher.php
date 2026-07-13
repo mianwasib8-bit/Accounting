@@ -32,7 +32,7 @@ if ($type === 'CRV') {
         ['id' => $id]
     );
     $lines = $db->fetchAll(
-        'SELECT * FROM cash_receipt_lines WHERE voucher_id = :id',
+        'SELECT * FROM cash_receipt_voucher_details WHERE voucher_id = :id',
         ['id' => $id]
     );
 } elseif ($type === 'CPV') {
@@ -41,7 +41,7 @@ if ($type === 'CRV') {
         ['id' => $id]
     );
     $lines = $db->fetchAll(
-        'SELECT * FROM cash_payment_lines WHERE voucher_id = :id',
+        'SELECT * FROM cash_payment_voucher_details WHERE voucher_id = :id',
         ['id' => $id]
     );
 } elseif ($type === 'JV') {
@@ -50,7 +50,7 @@ if ($type === 'CRV') {
         ['id' => $id]
     );
     $lines = $db->fetchAll(
-        'SELECT * FROM journal_lines WHERE voucher_id = :id',
+        'SELECT * FROM journal_voucher_details WHERE voucher_id = :id',
         ['id' => $id]
     );
 } elseif ($type === 'PUR') {
@@ -59,7 +59,7 @@ if ($type === 'CRV') {
         ['id' => $id]
     );
     $lines = $db->fetchAll(
-        'SELECT pl.*, i.item_name, i.item_code, i.packing FROM purchase_lines pl LEFT JOIN items i ON i.id = pl.item_id WHERE pl.purchase_id = :id',
+        'SELECT pl.*, i.item_name, i.item_code, i.packing FROM purchase_details pl LEFT JOIN items i ON i.id = pl.item_id WHERE pl.purchase_id = :id',
         ['id' => $id]
     );
 }

@@ -27,12 +27,17 @@ $cashBalance = LedgerService::totalCashBalance();
 
 $crvCount = (int)$db->fetchColumn("SELECT COUNT(*) FROM voucher_sequence WHERE voucher_type='CRV'");
 $cpvCount = (int)$db->fetchColumn("SELECT COUNT(*) FROM voucher_sequence WHERE voucher_type='CPV'");
+$jvCount  = (int)$db->fetchColumn("SELECT COUNT(*) FROM voucher_sequence WHERE voucher_type='JV'");
+$purCount = (int)$db->fetchColumn("SELECT COUNT(*) FROM voucher_sequence WHERE voucher_type='PUR'");
+
 $crvAmt = (float)$db->fetchColumn("SELECT COALESCE(SUM(total_amount),0) FROM cash_receipt_vouchers WHERE status='posted'");
 $cpvAmt = (float)$db->fetchColumn("SELECT COALESCE(SUM(total_amount),0) FROM cash_payment_vouchers WHERE status='posted'");
 
 $days = [];
 $crvSeries = [];
 $cpvSeries = [];
+$jvSeries = [];
+$purSeries = [];
 for ($i = 6; $i >= 0; $i--) {
     $d = date('Y-m-d', strtotime("-{$i} days"));
     $days[] = date('D', strtotime($d));
@@ -42,6 +47,14 @@ for ($i = 6; $i >= 0; $i--) {
     );
     $cpvSeries[] = (float)$db->fetchColumn(
         "SELECT COALESCE(SUM(total_amount),0) FROM cash_payment_vouchers WHERE voucher_date = :d AND status='posted'",
+        ['d' => $d]
+    );
+    $jvSeries[] = (float)$db->fetchColumn(
+        "SELECT COALESCE(SUM(total_debit),0) FROM journal_vouchers WHERE voucher_date = :d AND status='posted'",
+        ['d' => $d]
+    );
+    $purSeries[] = (float)$db->fetchColumn(
+        "SELECT COALESCE(SUM(net_amount),0) FROM purchases WHERE purchase_date = :d",
         ['d' => $d]
     );
 }
@@ -106,7 +119,7 @@ require __DIR__ . '/includes/layout_start.php';
   <div class="card card-pad">
     <div class="mb-4">
       <h3 style="margin:0;font-size:16px;font-weight:700">Voucher Mix</h3>
-      <p style="margin:4px 0 0;font-size:12px;color:var(--muted)">CRV vs CPV count</p>
+      <p style="margin:4px 0 0;font-size:12px;color:var(--muted)">All Vouchers Count</p>
     </div>
     <div class="chart-box">
       <canvas id="chart-pie"></canvas>
@@ -114,8 +127,8 @@ require __DIR__ . '/includes/layout_start.php';
   </div>
   <div class="card card-pad">
     <div class="mb-4">
-      <h3 style="margin:0;font-size:16px;font-weight:700">7-Day Cash Movement</h3>
-      <p style="margin:4px 0 0;font-size:12px;color:var(--muted)">Receipts vs Payments</p>
+      <h3 style="margin:0;font-size:16px;font-weight:700">7-Day Financial Movement</h3>
+      <p style="margin:4px 0 0;font-size:12px;color:var(--muted)">Receipts, Payments, JV, Purchases</p>
     </div>
     <div class="chart-box">
       <canvas id="chart-bar"></canvas>
@@ -125,11 +138,18 @@ require __DIR__ . '/includes/layout_start.php';
 
 <script>
 window.DASHBOARD_DATA = {
-  pie: { crv: <?= (int)$crvCount ?>, cpv: <?= (int)$cpvCount ?> },
+  pie: { 
+    crv: <?= (int)$crvCount ?>, 
+    cpv: <?= (int)$cpvCount ?>,
+    jv:  <?= (int)$jvCount ?>,
+    pur: <?= (int)$purCount ?>
+  },
   bar: {
     labels: <?= json_encode($days) ?>,
     crv: <?= json_encode($crvSeries) ?>,
-    cpv: <?= json_encode($cpvSeries) ?>
+    cpv: <?= json_encode($cpvSeries) ?>,
+    jv:  <?= json_encode($jvSeries) ?>,
+    pur: <?= json_encode($purSeries) ?>
   }
 };
 </script>

@@ -31,9 +31,9 @@ $allAccounts = $db->fetchAll(
      ORDER BY account_type = 'party' DESC, account_type IN ('cash','bank') DESC, title"
 );
 
-// Separate for JS: suppliers/parties and cash/bank
+// Separate for JS: suppliers/parties (all non-cash/bank) and cash/bank
 $supplierAccounts = array_filter($allAccounts, function($a) {
-    return $a['account_type'] === 'party';
+    return !in_array($a['account_type'], ['cash', 'bank']);
 });
 $cashBankAccounts = array_filter($allAccounts, function($a) {
     return in_array($a['account_type'], ['cash', 'bank']);

@@ -11,16 +11,18 @@
   if (pieEl) {
     const crv = d.pie.crv || 0;
     const cpv = d.pie.cpv || 0;
-    const empty = crv === 0 && cpv === 0;
+    const jv  = d.pie.jv || 0;
+    const pur = d.pie.pur || 0;
+    const empty = crv === 0 && cpv === 0 && jv === 0 && pur === 0;
     new Chart(pieEl, {
       type: 'doughnut',
       data: {
-        labels: ['Cash Receipts (CRV)', 'Cash Payments (CPV)'],
+        labels: ['CRV', 'CPV', 'JV', 'PUR'],
         datasets: [{
-          data: empty ? [1, 1] : [crv, cpv],
+          data: empty ? [1, 1, 1, 1] : [crv, cpv, jv, pur],
           backgroundColor: empty
-            ? ['#e2e8f0', '#cbd5e1']
-            : ['#10b981', '#f43f5e'],
+            ? ['#e2e8f0', '#cbd5e1', '#f1f5f9', '#eef2ff']
+            : ['#10b981', '#f43f5e', '#3b82f6', '#8b5cf6'],
           borderWidth: 0,
           hoverOffset: 6,
         }],
@@ -54,6 +56,20 @@
             label: 'Payments',
             data: d.bar.cpv,
             backgroundColor: 'rgba(244,63,94,.8)',
+            borderRadius: 8,
+            maxBarThickness: 28,
+          },
+          {
+            label: 'Journal',
+            data: d.bar.jv,
+            backgroundColor: 'rgba(59,130,246,.85)',
+            borderRadius: 8,
+            maxBarThickness: 28,
+          },
+          {
+            label: 'Purchases',
+            data: d.bar.pur,
+            backgroundColor: 'rgba(139,92,246,.8)',
             borderRadius: 8,
             maxBarThickness: 28,
           },

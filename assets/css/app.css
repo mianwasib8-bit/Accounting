@@ -23,7 +23,7 @@ html[data-theme="light"] {
   --success: #16a34a;
   --danger: #dc2626;
   --warning: #d97706;
-  --sidebar-w: 240px;
+  --sidebar-w: 220px;
   --nav-h: 64px;
   --radius: 16px;
   --shadow: 0 10px 30px -12px rgba(15, 23, 42, 0.1);
@@ -81,6 +81,7 @@ html[data-theme="dark"] {
   --danger: #fb7185;
   --warning: #fbbf24;
 
+  --sidebar-w: 220px;
   --sidebar-bg: linear-gradient(180deg, #0f172a 0%, #020617 100%);
   --sidebar-border: #1e293b;
   --sidebar-text: #cbd5e1;
@@ -140,18 +141,18 @@ button, input, select, textarea { font: inherit; }
 /* ========== SIDEBAR — FIXED on scroll ========== */
 .sidebar {
   position: fixed;
-  top: 12px;
-  left: 12px;
-  bottom: 12px;
+  top: 0;
+  left: 0;
+  bottom: 0;
   width: var(--sidebar-w);
   z-index: 50;
   display: flex;
   flex-direction: column;
   background: var(--sidebar-bg);
   color: var(--sidebar-text);
-  border: 1px solid var(--sidebar-border);
-  border-radius: 24px;
-  transform: translateX(calc(-100% - 24px));
+  border-right: 1px solid var(--sidebar-border);
+  border-radius: 0;
+  transform: translateX(-100%);
   transition: width .28s cubic-bezier(.4,0,.2,1), transform .28s, background .25s, border-color .25s, color .2s;
   box-shadow: var(--shadow);
   overflow: hidden;
@@ -160,10 +161,17 @@ button, input, select, textarea { font: inherit; }
 
 @media (min-width: 1024px) {
   .sidebar {
-    transform: none;
+    transform: translateX(0);
   }
   .app-shell {
-    padding-left: calc(var(--sidebar-w) + 24px);
+    padding-left: var(--sidebar-w);
+    transition: padding-left .28s;
+  }
+  body.sidebar-desktop-closed .sidebar {
+    transform: translateX(-100%);
+  }
+  body.sidebar-desktop-closed .app-shell {
+    padding-left: 0;
   }
 }
 
@@ -377,14 +385,12 @@ button, input, select, textarea { font: inherit; }
 }
 .icon-btn:hover { background: var(--icon-btn-hover); color: var(--ink); }
 .icon-btn svg { width: 20px; height: 20px; }
-.menu-btn { display: none; }
+.menu-btn { display: grid; }
 .desktop-only { display: none !important; }
 @media (min-width: 1024px) {
   .desktop-only { display: grid !important; }
-  .menu-btn { display: none !important; }
 }
 @media (max-width: 1023px) {
-  .menu-btn { display: grid !important; }
   .desktop-only { display: none !important; }
   .content { padding-left: 12px !important; }
 }

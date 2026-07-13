@@ -127,9 +127,13 @@
 
     function openMobile() {
       if (!sidebar) return;
-      sidebar.classList.add('open');
-      if (overlay) overlay.classList.add('show');
-      document.body.classList.add('sidebar-mobile-open');
+      if (window.matchMedia('(min-width: 1024px)').matches) {
+        document.body.classList.toggle('sidebar-desktop-closed');
+      } else {
+        sidebar.classList.add('open');
+        if (overlay) overlay.classList.add('show');
+        document.body.classList.add('sidebar-mobile-open');
+      }
     }
     function closeMobile() {
       if (!sidebar) return;
