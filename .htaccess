@@ -1,0 +1,14 @@
+# ApexBooks — Apache config for Laragon
+Options -Indexes
+
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  # Protect internal folders from direct web access
+  RewriteRule ^(app|config|database)/ - [F,L]
+</IfModule>
+
+<IfModule mod_headers.c>
+  Header set X-Content-Type-Options "nosniff"
+  Header set X-Frame-Options "SAMEORIGIN"
+  Header set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>
