@@ -23,7 +23,6 @@
       stock: document.getElementById('stock'),
       save: document.getElementById('btn-save-item'),
       update: document.getElementById('btn-update-item'),
-      clear: document.getElementById('btn-clear-item'),
       tbody: document.getElementById('items-tbody'),
     };
 
@@ -221,7 +220,6 @@
       });
     });
 
-    els.clear.addEventListener('click', clearForm);
     bindRows();
     previewCode();
   }

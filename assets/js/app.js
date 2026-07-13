@@ -6,7 +6,6 @@
   'use strict';
 
   var THEME_KEY = 'as_theme';
-  var COLLAPSE_KEY = 'as_sidebar_collapsed';
   var base = typeof window.APP_BASE === 'string' ? window.APP_BASE : '';
 
   window.Apex = {
@@ -121,17 +120,11 @@
 
   // Sidebar fixed + hide/show
   function initSidebar() {
-    var shell = document.getElementById('app-shell');
     var sidebar = document.getElementById('sidebar');
     var overlay = document.getElementById('sidebar-overlay');
     var openBtn = document.getElementById('btn-sidebar-open');
     var closeBtn = document.getElementById('btn-sidebar-close');
-    var collapseBtn = document.getElementById('btn-sidebar-collapse');
-    var collapseTop = document.getElementById('btn-sidebar-collapse-top');
 
-    function isDesktop() {
-      return window.matchMedia('(min-width: 1024px)').matches;
-    }
     function openMobile() {
       if (!sidebar) return;
       sidebar.classList.add('open');
@@ -144,38 +137,13 @@
       if (overlay) overlay.classList.remove('show');
       document.body.classList.remove('sidebar-mobile-open');
     }
-    function setCollapsed(collapsed) {
-      if (!shell) return;
-      shell.classList.toggle('sidebar-collapsed', collapsed);
-      try {
-        localStorage.setItem(COLLAPSE_KEY, collapsed ? '1' : '0');
-      } catch (e) {}
-    }
-    function toggleCollapse() {
-      if (!shell) return;
-      if (!isDesktop()) {
-        // mobile: open/close drawer
-        if (sidebar && sidebar.classList.contains('open')) closeMobile();
-        else openMobile();
-        return;
-      }
-      setCollapsed(!shell.classList.contains('sidebar-collapsed'));
-    }
-
-    try {
-      if (localStorage.getItem(COLLAPSE_KEY) === '1' && shell && isDesktop()) {
-        setCollapsed(true);
-      }
-    } catch (e) {}
 
     if (openBtn) openBtn.addEventListener('click', openMobile);
     if (closeBtn) closeBtn.addEventListener('click', closeMobile);
     if (overlay) overlay.addEventListener('click', closeMobile);
-    if (collapseBtn) collapseBtn.addEventListener('click', toggleCollapse);
-    if (collapseTop) collapseTop.addEventListener('click', toggleCollapse);
 
     window.addEventListener('resize', function () {
-      if (isDesktop()) closeMobile();
+      if (window.matchMedia('(min-width: 1024px)').matches) closeMobile();
     });
   }
 

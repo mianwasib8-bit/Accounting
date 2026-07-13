@@ -44,7 +44,6 @@ require dirname(__DIR__, 2) . '/includes/layout_start.php';
       <div class="flex gap-2 flex-wrap">
         <button type="submit" class="btn btn-primary" id="btn-cat-save">Save</button>
         <button type="button" class="btn btn-secondary" id="btn-cat-update" disabled>Update</button>
-        <button type="button" class="btn btn-secondary" id="btn-cat-clear">Clear</button>
       </div>
     </form>
   </div>
