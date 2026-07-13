@@ -177,12 +177,6 @@ $userOpen = inGroup(['profile', 'password'], $activePage);
     </nav>
 
     <div class="sidebar-foot">
-      <button type="button" id="btn-sidebar-collapse" class="nav-item collapse-btn" title="Hide / show sidebar">
-        <span class="nav-ico">
-          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M11 19l-7-7 7-7m8 14l-7-7 7-7"/></svg>
-        </span>
-        <span class="sidebar-label nav-item-text">Collapse</span>
-      </button>
       <div class="user-chip">
         <div class="avatar"><?= e(strtoupper(substr($user['full_name'] ?? 'U', 0, 1))) ?></div>
         <div class="user-meta sidebar-label">
@@ -201,9 +195,6 @@ $userOpen = inGroup(['profile', 'password'], $activePage);
     <header class="topbar">
       <button type="button" id="btn-sidebar-open" class="icon-btn menu-btn" aria-label="Open menu">
         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
-      </button>
-      <button type="button" id="btn-sidebar-collapse-top" class="icon-btn desktop-only" title="Hide / show sidebar" aria-label="Toggle sidebar">
-        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M4 6h16M4 12h10M4 18h16"/></svg>
       </button>
       <div class="page-title">
         <h1><?= e($pageTitle) ?></h1>

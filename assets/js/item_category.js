@@ -17,7 +17,6 @@
     var titleEl = document.getElementById('cat_title');
     var btnSave = document.getElementById('btn-cat-save');
     var btnUpdate = document.getElementById('btn-cat-update');
-    var btnClear = document.getElementById('btn-cat-clear');
     var tbody = document.getElementById('cat-tbody');
 
     function esc(s) {
@@ -150,12 +149,6 @@
         btnUpdate.disabled = false;
         setEdit(true);
         Apex.toast(err.message || 'Error', 'error');
-      });
-    });
-
-    btnClear.addEventListener('click', function () {
-      Apex.api('/api/item_categories.php').then(function (d) {
-        clearForm(d.next_code || '01');
       });
     });
 

@@ -99,14 +99,24 @@ class ItemCategory
         if (!$row) {
             throw new \InvalidArgumentException('Category not found.');
         }
-        $cnt = (int)Database::getInstance()->fetchColumn(
-            'SELECT COUNT(*) FROM items WHERE category_id = :id AND is_active = 1',
+        $db = Database::getInstance();
+        
+        // First, delete all related items (cascade delete)
+        $items = $db->fetchAll(
+            'SELECT id, item_code FROM items WHERE category_id = :id AND is_active = 1',
             ['id' => $id]
         );
-        if ($cnt > 0) {
-            throw new \InvalidArgumentException('Category has items. Delete or move items first.');
+        
+        foreach ($items as $item) {
+            $db->query(
+                'UPDATE items SET is_active = 0 WHERE id = :id',
+                ['id' => $item['id']]
+            );
+            Audit::log(Auth::id(), 'delete', 'item', (string)$item['id'], "Deleted item {$item['item_code']} (cascaded from category delete)");
         }
-        Database::getInstance()->query(
+        
+        // Then delete the category
+        $db->query(
             'UPDATE item_categories SET is_active = 0 WHERE id = :id',
             ['id' => $id]
         );
