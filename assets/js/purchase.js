@@ -22,8 +22,6 @@
       date: document.getElementById('purchase_date'),
       bill: document.getElementById('bill_no'),
       mode: document.getElementById('pay_mode'),
-      cashField: document.getElementById('cash-field'),
-      cash: document.getElementById('cash_account_id'),
       party: document.getElementById('party_id'),
       partyCode: document.getElementById('party_code'),
       partyBal: document.getElementById('party_balance'),
@@ -123,8 +121,13 @@
       els.net.textContent = money(finalNet);
 
       var partyOk = !!els.party.value;
-      var cashOk = els.mode.value !== 'Cash' || !!els.cash.value;
-      els.save.disabled = !(valid >= 1 && finalNet > 0 && partyOk && cashOk);
+      var accountTypeOk = true;
+      if (partyOk && els.mode.value === 'Cash') {
+        var partyOpt = els.party.options[els.party.selectedIndex];
+        var partyType = partyOpt ? partyOpt.getAttribute('data-type') : '';
+        accountTypeOk = partyType === 'cash' || partyType === 'bank';
+      }
+      els.save.disabled = !(valid >= 1 && finalNet > 0 && partyOk && accountTypeOk);
     }
 
     function addRow() {
@@ -233,8 +236,43 @@
     }
 
     function onModeChange() {
-      var cash = els.mode.value === 'Cash';
-      els.cashField.style.display = cash ? '' : 'none';
+      // Filter party dropdown based on mode
+      var mode = els.mode.value;
+      var partySelect = els.party;
+      var currentValue = partySelect.value;
+      
+      // Rebuild options based on mode
+      var optionsHtml = '<option value="">— Select account —</option>';
+      if (mode === 'Cash') {
+        // Show only Cash/Bank accounts
+        bootData.cashAccounts.forEach(function(a) {
+          var sel = String(a.id) === String(currentValue) ? ' selected' : '';
+          optionsHtml += '<option value="' + a.id + '" data-code="' + esc(a.code) + '" data-type="' + esc(a.type) + '"' + sel + '>' + esc(a.title) + ' (' + esc(a.type.toUpperCase()) + ')</option>';
+        });
+      } else {
+        // Show only Party/Supplier accounts
+        bootData.supplierAccounts.forEach(function(a) {
+          var sel = String(a.id) === String(currentValue) ? ' selected' : '';
+          optionsHtml += '<option value="' + a.id + '" data-code="' + esc(a.code) + '" data-type="' + esc(a.type) + '"' + sel + '>' + esc(a.title) + ' (' + esc(a.type.toUpperCase()) + ')</option>';
+        });
+      }
+      partySelect.innerHTML = optionsHtml;
+      
+      // If current selection doesn't match the filter, clear it
+      if (currentValue) {
+        var found = false;
+        for (var i = 0; i < partySelect.options.length; i++) {
+          if (partySelect.options[i].value === String(currentValue)) {
+            found = true;
+            break;
+          }
+        }
+        if (!found) {
+          partySelect.value = '';
+          els.partyCode.value = '—';
+          els.partyBal.value = '0.00';
+        }
+      }
       recalc();
     }
 
@@ -262,12 +300,16 @@
         return;
       }
       if (!els.party.value) {
-        Apex.toast('Select party.', 'error');
+        Apex.toast('Select account.', 'error');
         return;
       }
-      if (els.mode.value === 'Cash' && !els.cash.value) {
-        Apex.toast('Select cash / bank account.', 'error');
-        return;
+      if (els.mode.value === 'Cash') {
+        var partyOpt = els.party.options[els.party.selectedIndex];
+        var partyType = partyOpt ? partyOpt.getAttribute('data-type') : '';
+        if (partyType !== 'cash' && partyType !== 'bank') {
+          Apex.toast('For Cash mode, please select a Cash or Bank account.', 'error');
+          return;
+        }
       }
 
       els.save.disabled = true;
@@ -282,7 +324,6 @@
             pay_mode: els.mode.value,
             party_id: parseInt(els.party.value, 10),
             company_name: els.company.value.trim(),
-            cash_account_id: parseInt(els.cash.value, 10) || 0,
             bill_expense: num(els.expense.value),
             lines: lines,
           }),
@@ -311,7 +352,6 @@
     els.party.addEventListener('change', onPartyChange);
     els.mode.addEventListener('change', onModeChange);
     els.expense.addEventListener('input', recalc);
-    if (els.cash) els.cash.addEventListener('change', recalc);
     if (els.add) {
       els.add.addEventListener('click', function (ev) {
         ev.preventDefault();

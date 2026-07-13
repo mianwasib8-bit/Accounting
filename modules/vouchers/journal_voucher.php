@@ -38,10 +38,7 @@ require dirname(__DIR__, 2) . '/includes/layout_start.php';
         <label>Voucher No.</label>
         <input class="input input-sm input-mono" type="text" id="voucher_ref" value="…" readonly disabled tabindex="-1" />
       </div>
-      <div class="field">
-        <label>Sequence <span class="hint">(shared)</span></label>
-        <input class="input input-sm input-mono" type="text" id="sequence_no" value="…" readonly disabled tabindex="-1" />
-      </div>
+      <input type="hidden" id="sequence_no" value="…" />
       <div class="field">
         <label for="voucher_date">Date</label>
         <input class="input input-sm" type="date" id="voucher_date" value="<?= e($today) ?>" required />

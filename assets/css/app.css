@@ -23,7 +23,7 @@ html[data-theme="light"] {
   --success: #16a34a;
   --danger: #dc2626;
   --warning: #d97706;
-  --sidebar-w: 270px;
+  --sidebar-w: 240px;
   --nav-h: 64px;
   --radius: 16px;
   --shadow: 0 10px 30px -12px rgba(15, 23, 42, 0.1);
@@ -954,4 +954,23 @@ html[data-theme="dark"] .icon-action.btn-del:hover {
 }
 .voucher-actions {
   padding: 12px 16px !important;
+}
+
+/* ========== PRINT STYLES (A4 Size) ========== */
+@media print {
+  .no-print { display: none !important; }
+  .sidebar, .topbar, .btn, .icon-action, .btn-add-row, .btn-clear, .btn-secondary { display: none !important; }
+  .content { padding: 0 !important; }
+  .card { box-shadow: none !important; border: 1px solid #ccc !important; break-inside: avoid; }
+  .main-wrap { padding: 0 !important; }
+  .app-shell { padding: 0 !important; background: white !important; }
+  body { background: white !important; }
+  @page {
+    size: A4;
+    margin: 10mm;
+  }
+  table { page-break-inside: auto; }
+  tr { page-break-inside: avoid; page-break-after: auto; }
+  thead { display: table-header-group; }
+  tfoot { display: table-footer-group; }
 }

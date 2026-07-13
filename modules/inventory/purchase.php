@@ -23,23 +23,25 @@ $today = date('Y-m-d');
 $items = Item::all();
 $db = Database::getInstance();
 
-// Parties for supplier dropdown (party type preferred, else all active)
-$parties = $db->fetchAll(
+// Get all accounts for party dropdown (suppliers, cash, bank)
+$allAccounts = $db->fetchAll(
     "SELECT id, full_code, title, account_type
      FROM subsidiary_heads
      WHERE is_active = 1
-     ORDER BY account_type = 'party' DESC, title"
-);
-$cashAccounts = $db->fetchAll(
-    "SELECT id, full_code, title
-     FROM subsidiary_heads
-     WHERE is_active = 1 AND account_type IN ('cash','bank')
-     ORDER BY full_code"
+     ORDER BY account_type = 'party' DESC, account_type IN ('cash','bank') DESC, title"
 );
 
-// Preload party balances for JS
+// Separate for JS: suppliers/parties and cash/bank
+$supplierAccounts = array_filter($allAccounts, function($a) {
+    return $a['account_type'] === 'party';
+});
+$cashBankAccounts = array_filter($allAccounts, function($a) {
+    return in_array($a['account_type'], ['cash', 'bank']);
+});
+
+// Preload balances for all accounts
 $partyBalances = [];
-foreach ($parties as $p) {
+foreach ($allAccounts as $p) {
     $partyBalances[(int)$p['id']] = LedgerService::previousBalance((int)$p['id']);
 }
 
@@ -75,22 +77,13 @@ require dirname(__DIR__, 2) . '/includes/layout_start.php';
           <option value="Cash">Cash</option>
         </select>
       </div>
-      <div class="field" id="cash-field" style="display:none">
-        <label for="cash_account_id">Cash / Bank</label>
-        <select class="select input-sm" id="cash_account_id">
-          <option value="">— Select —</option>
-          <?php foreach ($cashAccounts as $c): ?>
-            <option value="<?= (int)$c['id'] ?>"><?= e($c['title']) ?></option>
-          <?php endforeach; ?>
-        </select>
-      </div>
       <div class="field">
-        <label for="party_id">Party</label>
+        <label for="party_id">Account (Party / Cash / Bank)</label>
         <select class="select input-sm" id="party_id" required>
-          <option value="">— Select party —</option>
-          <?php foreach ($parties as $p): ?>
-            <option value="<?= (int)$p['id'] ?>" data-code="<?= e($p['full_code']) ?>">
-              <?= e($p['title']) ?>
+          <option value="">— Select account —</option>
+          <?php foreach ($allAccounts as $a): ?>
+            <option value="<?= (int)$a['id'] ?>" data-code="<?= e($a['full_code']) ?>" data-type="<?= e($a['account_type']) ?>">
+              <?= e($a['title']) ?> (<?= e(strtoupper($a['account_type'])) ?>)
             </option>
           <?php endforeach; ?>
         </select>
@@ -176,7 +169,13 @@ window.PURCHASE_BOOT = {
           'stock' => (float)$i['stock'],
       ];
   }, $items), JSON_UNESCAPED_UNICODE) ?>,
-  partyBalances: <?= json_encode($partyBalances) ?>
+  partyBalances: <?= json_encode($partyBalances) ?>,
+  supplierAccounts: <?= json_encode(array_map(function($a) {
+      return ['id' => (int)$a['id'], 'code' => $a['full_code'], 'title' => $a['title'], 'type' => $a['account_type']];
+  }, $supplierAccounts)) ?>,
+  cashAccounts: <?= json_encode(array_map(function($a) {
+      return ['id' => (int)$a['id'], 'code' => $a['full_code'], 'title' => $a['title'], 'type' => $a['account_type']];
+  }, $cashBankAccounts)) ?>
 };
 </script>
 
